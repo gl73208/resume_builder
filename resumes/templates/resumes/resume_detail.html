@@ -1,0 +1,77 @@
+{% extends "resumes/base.html" %}
+{% block content %}
+  <h2>{{ resume.title }}</h2>
+  
+  <!-- Основная информация -->
+  <div class="mb-3">
+    <p><strong>Название резюме:</strong> {{ resume.title }}</p>
+  </div>
+
+  <!-- Персональные данные -->
+  <h3>Персональные данные</h3>
+  <div class="mb-3">
+    <p><strong>Имя:</strong> {{ personal_data.first_name }}</p>
+    <p><strong>Фамилия:</strong> {{ personal_data.last_name }}</p>
+    <p><strong>Отчество:</strong> {{ personal_data.patronymic }}</p>
+    <p><strong>Дата рождения:</strong> {{ personal_data.birth_date }}</p>
+    <p><strong>Пол:</strong> {{ personal_data.get_gender_display }}</p>
+    <p><strong>Электронная почта:</strong> {{ personal_data.email }}</p>
+    <p><strong>Номер телефона:</strong> {{ personal_data.phone }}</p>
+    <p><strong>Город проживания:</strong> {{ personal_data.city }}</p>
+  </div>
+
+  <!-- Раздел "Образование" -->
+  <h3>Образование</h3>
+  {% if education_entries %}
+    {% for education in education_entries %}
+      <div class="mb-3">
+        <p><strong>Учебное заведение:</strong> {{ education.institution }}</p>
+        <p><strong>Год окончания:</strong> {{ education.end_year }}</p>
+        <p><strong>Факультет:</strong> {{ education.faculty }}</p>
+        <p><strong>Специальность:</strong> {{ education.specialty }}</p>
+        <hr>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Образование не указано.</p>
+  {% endif %}
+
+  <!-- Раздел "Опыт работы" -->
+  <h3>Опыт работы</h3>
+  {% if experience_entries %}
+    {% for experience in experience_entries %}
+      <div class="mb-3">
+        <p><strong>Компания:</strong> {{ experience.company }}</p>
+        <p><strong>Должность:</strong> {{ experience.position }}</p>
+        <p><strong>Дата начала работы:</strong> {{ experience.date_from }}</p>
+        <p><strong>Дата окончания работы:</strong> {{ experience.date_to|default:"Не указано" }}</p>
+        <p><strong>Описание:</strong> {{ experience.description }}</p>
+        <hr>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Опыт работы не указан.</p>
+  {% endif %}
+
+  <!-- Раздел "Навыки" -->
+  <h3>Навыки</h3>
+  {% if skills_entries %}
+    {% for skill in skills_entries %}
+      <div class="mb-3">
+        <p><strong>Навык:</strong> {{ skill.skill }}</p>
+        <p><strong>Уровень:</strong> {{ skill.get_level_display }}</p>
+        <hr>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Навыки не указаны.</p>
+  {% endif %}
+
+  <!-- Кнопки действий -->
+  <div class="mt-4">
+    <a href="{% url 'resume_edit' resume.pk %}" class="btn btn-primary">Редактировать</a>
+    <a href="{% url 'resume_delete' resume.pk %}" class="btn btn-danger">Удалить</a>
+    <!-- Кнопка "Экспорт в PDF" -->
+    <a href="{% url 'resume_export_pdf' resume.pk %}" class="btn btn-secondary">Экспорт в PDF</a>
+  </div>
+{% endblock %}

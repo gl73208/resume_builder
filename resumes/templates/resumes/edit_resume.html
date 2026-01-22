@@ -1,0 +1,396 @@
+{% extends "resumes/base.html" %}
+{% block content %}
+  <h2>Редактировать резюме</h2>
+  
+  <form method="post" novalidate id="resume-form">
+    {% csrf_token %}
+    
+    <!-- Основная информация -->
+    <div class="mb-3 personal-data-field">
+      <label for="id_title" class="form-label">Название резюме</label>
+      {{ resume_form.title }}
+      {% if resume_form.title.errors %}
+        <div class="text-danger">{{ resume_form.title.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <!-- Персональные данные -->
+    <h3 class="mt-4">Персональные данные</h3>
+    <div class="mb-3 personal-data-field">
+      <label for="id_first_name" class="form-label">Имя</label>
+      {{ personal_data_form.first_name }}
+      {% if personal_data_form.first_name.errors %}
+        <div class="text-danger">{{ personal_data_form.first_name.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_last_name" class="form-label">Фамилия</label>
+      {{ personal_data_form.last_name }}
+      {% if personal_data_form.last_name.errors %}
+        <div class="text-danger">{{ personal_data_form.last_name.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_patronymic" class="form-label">Отчество</label>
+      {{ personal_data_form.patronymic }}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_birth_date" class="form-label">Дата рождения</label>
+      <input type="date" name="birth_date" id="id_birth_date" class="form-control" value="{{ personal_data_form.birth_date.value|date:'Y-m-d' }}">
+      {% if personal_data_form.birth_date.errors %}
+        <div class="text-danger">{{ personal_data_form.birth_date.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_gender" class="form-label">Пол</label>
+      {{ personal_data_form.gender }}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_email" class="form-label">Электронная почта</label>
+      {{ personal_data_form.email }}
+      {% if personal_data_form.email.errors %}
+        <div class="text-danger">{{ personal_data_form.email.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_phone" class="form-label">Номер телефона</label>
+      {{ personal_data_form.phone }}
+      {% if personal_data_form.phone.errors %}
+        <div class="text-danger">{{ personal_data_form.phone.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <div class="mb-3 personal-data-field">
+      <label for="id_city" class="form-label">Город проживания</label>
+      {{ personal_data_form.city }}
+      {% if personal_data_form.city.errors %}
+        <div class="text-danger">{{ personal_data_form.city.errors }}</div>
+      {% endif %}
+    </div>
+    
+    <!-- Раздел "Образование" -->
+    <h3 class="mt-4">Образование</h3>
+    <div id="education-fields">
+      <!-- Существующие записи об образовании -->
+      {% for education in education_entries %}
+        <div class="education-field mb-3" data-education-pk="{{ education.pk }}">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="id_institution_{{ education.pk }}" class="form-label">Учебное заведение</label>
+              <input type="text" name="institution_{{ education.pk }}" id="id_institution_{{ education.pk }}" class="form-control" value="{{ education.institution }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_faculty_{{ education.pk }}" class="form-label">Факультет</label>
+              <input type="text" name="faculty_{{ education.pk }}" id="id_faculty_{{ education.pk }}" class="form-control" value="{{ education.faculty }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_specialty_{{ education.pk }}" class="form-label">Специальность</label>
+              <input type="text" name="specialty_{{ education.pk }}" id="id_specialty_{{ education.pk }}" class="form-control" value="{{ education.specialty }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_end_year_{{ education.pk }}" class="form-label">Год окончания</label>
+              <input type="number" name="end_year_{{ education.pk }}" id="id_end_year_{{ education.pk }}" class="form-control" value="{{ education.end_year }}">
+            </div>
+            <button type="button" class="btn btn-danger remove-education">Удалить</button>
+          </div>
+          <hr>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-education" class="btn btn-secondary mb-3">Добавить образование</button>
+    
+    <!-- Раздел "Опыт работы" -->
+    <h3 class="mt-4">Опыт работы</h3>
+    <div id="experience-fields">
+      <!-- Существующие записи об опыте работы -->
+      {% for experience in experience_entries %}
+        <div class="experience-field mb-3" data-experience-pk="{{ experience.pk }}">
+          <div class="mb-3">
+            <label for="id_company_{{ experience.pk }}" class="form-label">Компания</label>
+            <input type="text" name="company_{{ experience.pk }}" id="id_company_{{ experience.pk }}" class="form-control" value="{{ experience.company }}">
+          </div>
+          <div class="mb-3">
+            <label for="id_position_{{ experience.pk }}" class="form-label">Должность</label>
+            <input type="text" name="position_{{ experience.pk }}" id="id_position_{{ experience.pk }}" class="form-control" value="{{ experience.position }}">
+          </div>
+          <div class="mb-3">
+            <label for="id_date_from_{{ experience.pk }}" class="form-label">Дата начала работы</label>
+            <input type="date" name="date_from_{{ experience.pk }}" id="id_date_from_{{ experience.pk }}" class="form-control" value="{{ experience.date_from|date:'Y-m-d' }}">
+          </div>
+          <div class="mb-3">
+            <label for="id_date_to_{{ experience.pk }}" class="form-label">Дата окончания работы</label>
+            <input type="date" name="date_to_{{ experience.pk }}" id="id_date_to_{{ experience.pk }}" class="form-control" value="{{ experience.date_to|date:'Y-m-d' }}">
+          </div>
+          <div class="mb-3">
+            <label for="id_description_{{ experience.pk }}" class="form-label">Описание</label>
+            <textarea name="description_{{ experience.pk }}" id="id_description_{{ experience.pk }}" class="form-control">{{ experience.description }}</textarea>
+          </div>
+          <button type="button" class="btn btn-danger remove-experience">Удалить</button>
+          <hr>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-experience" class="btn btn-secondary mb-3">Добавить опыт работы</button>
+
+    <!-- Раздел "Навыки" -->
+    <h3 class="mt-4">Навыки</h3>
+    <div id="skills-fields">
+      <!-- Существующие записи о навыках -->
+      {% for skill in skills_entries %}
+        <div class="skill-field mb-3" data-skill-pk="{{ skill.pk }}">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="id_skill_{{ skill.pk }}" class="form-label">Навык</label>
+              <input type="text" name="skill_{{ skill.pk }}" id="id_skill_{{ skill.pk }}" class="form-control" value="{{ skill.skill }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="id_level_{{ skill.pk }}" class="form-label">Уровень</label>
+              <select name="level_{{ skill.pk }}" id="id_level_{{ skill.pk }}" class="form-control">
+                <option value="B" {% if skill.level == 'B' %}selected{% endif %}>Базовый</option>
+                <option value="I" {% if skill.level == 'I' %}selected{% endif %}>Средний</option>
+                <option value="A" {% if skill.level == 'A' %}selected{% endif %}>Продвинутый</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-danger remove-skill">Удалить</button>
+          </div>
+          <hr>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-skill" class="btn btn-secondary mb-3">Добавить навык</button>
+    
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+  </form>
+
+  <style>
+    .remove-education, .remove-experience, .remove-skill {
+      margin-top: 10px;
+      width: auto;
+      padding: 5px 10px;
+      height: 38px; /* Высота кнопки "Удалить" */
+    }
+
+    /* Стили для полей в разделе "Персональные данные" и для названия резюме */
+    .personal-data-field label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: normal;
+    }
+
+    .personal-data-field input,
+    .personal-data-field select,
+    .personal-data-field textarea {
+      width: 50%; /* Ширина полей 50% */
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Стили для динамически добавляемых полей */
+    .education-field .row,
+    .experience-field,
+    .skill-field {
+      margin-bottom: 15px;
+    }
+
+    .education-field .row input,
+    .experience-field input,
+    .skill-field input,
+    .skill-field select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .skill-field .row {
+      display: flex;
+      gap: 10px;
+      align-items: center; /* Выравниваем элементы по центру */
+    }
+
+    .skill-field .row .col-md-6 {
+      flex: 1;
+    }
+
+    /* Стили для селекта с прочерком по умолчанию */
+    select {
+      appearance: none; /* Убираем стандартный вид селекта */
+      background-color: white;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.7rem top 50%;
+      background-size: 0.65rem auto;
+    }
+  </style>
+
+  <script>
+    // Счетчик для уникальных идентификаторов новых полей образования
+    let educationCount = {{ education_entries|length }};
+
+    // Добавление нового блока с полями для образования
+    document.getElementById('add-education').addEventListener('click', function () {
+      const container = document.getElementById('education-fields');
+    
+      const newEducationField = document.createElement('div');
+      newEducationField.classList.add('education-field', 'mb-3');
+      newEducationField.innerHTML = `
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_institution_${educationCount}" class="form-label">Учебное заведение</label>
+            <input type="text" name="institution_${educationCount}" id="id_institution_${educationCount}" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_faculty_${educationCount}" class="form-label">Факультет</label>
+            <input type="text" name="faculty_${educationCount}" id="id_faculty_${educationCount}" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_specialty_${educationCount}" class="form-label">Специальность</label>
+            <input type="text" name="specialty_${educationCount}" id="id_specialty_${educationCount}" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_end_year_${educationCount}" class="form-label">Год окончания</label>
+            <input type="number" name="end_year_${educationCount}" id="id_end_year_${educationCount}" class="form-control">
+          </div>
+          <button type="button" class="btn btn-danger remove-education">Удалить</button>
+        </div>
+        <hr>
+      `;
+    
+      container.appendChild(newEducationField);
+      educationCount++;
+    });
+
+    // Удаление блока по нажатию кнопки "Удалить" (образование)
+    document.getElementById('education-fields').addEventListener('click', function (event) {
+      if (event.target && event.target.classList.contains('remove-education')) {
+        const block = event.target.closest('.education-field');
+        if (block) {
+          const educationPk = block.dataset.educationPk;
+          if (educationPk) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = `delete_education_${educationPk}`;
+            hiddenInput.value = 'on';
+            block.appendChild(hiddenInput);
+          }
+          block.style.display = 'none';
+        }
+      }
+    });
+
+    // Счетчик для уникальных идентификаторов новых полей опыта работы
+    let experienceCount = {{ experience_entries|length }};
+
+    // Добавление нового блока с полями для опыта работы
+    document.getElementById('add-experience').addEventListener('click', function () {
+      const container = document.getElementById('experience-fields');
+    
+      const newExperienceField = document.createElement('div');
+      newExperienceField.classList.add('experience-field', 'mb-3');
+      newExperienceField.innerHTML = `
+        <div class="mb-3">
+          <label for="id_company_${experienceCount}" class="form-label">Компания</label>
+          <input type="text" name="company_${experienceCount}" id="id_company_${experienceCount}" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="id_position_${experienceCount}" class="form-label">Должность</label>
+          <input type="text" name="position_${experienceCount}" id="id_position_${experienceCount}" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="id_date_from_${experienceCount}" class="form-label">Дата начала работы</label>
+          <input type="date" name="date_from_${experienceCount}" id="id_date_from_${experienceCount}" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="id_date_to_${experienceCount}" class="form-label">Дата окончания работы</label>
+          <input type="date" name="date_to_${experienceCount}" id="id_date_to_${experienceCount}" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="id_description_${experienceCount}" class="form-label">Описание</label>
+          <textarea name="description_${experienceCount}" id="id_description_${experienceCount}" class="form-control"></textarea>
+        </div>
+        <button type="button" class="btn btn-danger remove-experience">Удалить</button>
+        <hr>
+      `;
+    
+      container.appendChild(newExperienceField);
+      experienceCount++;
+    });
+
+    // Удаление блока по нажатию кнопки "Удалить" (опыт работы)
+    document.getElementById('experience-fields').addEventListener('click', function (event) {
+      if (event.target && event.target.classList.contains('remove-experience')) {
+        const block = event.target.closest('.experience-field');
+        if (block) {
+          const experiencePk = block.dataset.experiencePk;
+          if (experiencePk) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = `delete_experience_${experiencePk}`;
+            hiddenInput.value = 'on';
+            block.appendChild(hiddenInput);
+          }
+          block.style.display = 'none';
+        }
+      }
+    });
+
+    // Счетчик для уникальных идентификаторов новых полей навыков
+    let skillsCount = {{ skills_entries|length }};
+
+    // Добавление нового блока с полями для навыков
+    document.getElementById('add-skill').addEventListener('click', function () {
+      const container = document.getElementById('skills-fields');
+    
+      const newSkillField = document.createElement('div');
+      newSkillField.classList.add('skill-field', 'mb-3');
+      newSkillField.innerHTML = `
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_skill_${skillsCount}" class="form-label">Навык</label>
+            <input type="text" name="skill_${skillsCount}" id="id_skill_${skillsCount}" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_level_${skillsCount}" class="form-label">Уровень</label>
+            <select name="level_${skillsCount}" id="id_level_${skillsCount}" class="form-control">
+              <option value="B">Базовый</option>
+              <option value="I">Средний</option>
+              <option value="A">Продвинутый</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-danger remove-skill">Удалить</button>
+        </div>
+        <hr>
+      `;
+    
+      container.appendChild(newSkillField);
+      skillsCount++;
+    });
+
+    // Удаление блока по нажатию кнопки "Удалить" (навыки)
+    document.getElementById('skills-fields').addEventListener('click', function (event) {
+      if (event.target && event.target.classList.contains('remove-skill')) {
+        const block = event.target.closest('.skill-field');
+        if (block) {
+          const skillPk = block.dataset.skillPk;
+          if (skillPk) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = `delete_skill_${skillPk}`;
+            hiddenInput.value = 'on';
+            block.appendChild(hiddenInput);
+          }
+          block.style.display = 'none';
+        }
+      }
+    });
+  </script>
+{% endblock %}
