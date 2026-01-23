@@ -28,4 +28,13 @@ python manage.py runserver
 
 ## Документация
 
-Курсовая работа находится в папке `docs/`.
+Курсовая работа находится в папке `docs/`
+
+Диаграммы находятся в папке `diagrams/` (исходный файл `UML.drawio` можно редактировать в [draw.io](https://app.diagrams.net))
+
+## Диаграммы
+### Диаграмма вариантов использования
+![Use Case](diagrams/UseCase.png)
+
+### Диаграмма классов
+![Диаграмма классов](diagrams/ClassDiagram.png)
